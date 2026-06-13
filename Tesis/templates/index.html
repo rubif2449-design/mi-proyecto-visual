@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Monitoreo Térmico - Tiempo Real</title>
+    <link rel="stylesheet" href="static/styles.css">
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1> Monitoreo Térmico en Tiempo Real</h1>
+                <p class="subtitle">Sistema Inteligente de Detección de Estrés</p>
+            </div>
+            <div class="connection-status">
+                <div id="connectionIndicator" class="indicator disconnected"></div>
+                <span id="connectionText">Desconectado</span>
+            </div>
+        </header>
+
+        <!-- Control Panel -->
+        <div class="control-panel">
+            <div class="control-group">
+                <label for="stressThreshold">Umbral de Estrés:</label>
+                <input type="range" id="stressThreshold" min="0" max="100" value="70">
+                <span id="thresholdValue">70%</span>
+            </div>
+            <div class="control-group">
+                <label for="alertsToggle">Alertas:</label>
+                <input type="checkbox" id="alertsToggle" checked>
+                <span id="alertsStatus">Activadas</span>
+            </div>
+            <div class="control-group">
+                <label for="monitoringToggle">Monitoreo:</label>
+                <input type="checkbox" id="monitoringToggle" checked>
+                <span id="monitoringStatus">Activo</span>
+            </div>
+        </div>
+
+        <!-- Main Grid -->
+        <div class="main-grid">
+            <!-- Left Section: Real-time Data -->
+            <div class="left-section">
+                <!-- Stress Level Display -->
+                <div class="card stress-display">
+                    <h2>Nivel de Estrés</h2>
+                    <div class="stress-meter">
+                        <div class="stress-bar" id="stressBar"></div>
+                    </div>
+                    <div class="stress-value" id="stressValue">0%</div>
+                    <div class="stress-status" id="stressStatus">✓ Normal</div>
+                </div>
+
+                <!-- Temperature Summary -->
+                <div class="card temp-summary">
+                    <h2>Resumen Térmico</h2>
+                    <div class="temp-grid">
+                        <div class="temp-box">
+                            <div class="label">Actual</div>
+                            <div class="value" id="currentTemp">37.5°C</div>
+                        </div>
+                        <div class="temp-box">
+                            <div class="label">Promedio</div>
+                            <div class="value" id="avgTemp">37.5°C</div>
+                        </div>
+                        <div class="temp-box">
+                            <div class="label">Máxima</div>
+                            <div class="value hot" id="maxTemp">37.5°C</div>
+                        </div>
+                        <div class="temp-box">
+                            <div class="label">Mínima</div>
+                            <div class="value cold" id="minTemp">37.5°C</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Thermal Zones -->
+                <div class="card thermal-zones">
+                    <h2>Zonas Térmicas</h2>
+                    <div id="thermalZones" class="zones-grid">
+                        <div class="zone">
+                            <div class="zone-name">Cabeza</div>
+                            <div class="zone-temp" id="zoneHead">--°C</div>
+                        </div>
+                        <div class="zone">
+                            <div class="zone-name">Cuerpo</div>
+                            <div class="zone-temp" id="zoneBody">--°C</div>
+                        </div>
+                        <div class="zone">
+                            <div class="zone-name">Patas</div>
+                            <div class="zone-temp" id="zoneLegs">--°C</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Middle Section: Charts -->
+            <div class="middle-section">
+                <!-- Temperature Chart -->
+                <div class="card chart-container">
+                    <h2>Temperatura en Tiempo Real</h2>
+                    <canvas id="tempChart"></canvas>
+                </div>
+
+                <!-- Stress Level Chart -->
+                <div class="card chart-container">
+                    <h2>Nivel de Estrés</h2>
+                    <canvas id="stressChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Right Section: Alerts -->
+            <div class="right-section">
+                <!-- Alerts Panel -->
+                <div class="card alerts-panel">
+                    <h2> Alertas y Notificaciones</h2>
+                    <div id="alertsList" class="alerts-list">
+                        <div class="alert alert-info">
+                            <span class="alert-icon">i</span>
+                            <span>Sistema iniciado. Esperando conexión de cámara...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- System Status -->
+                <div class="card system-status">
+                    <h2>Estado del Sistema</h2>
+                    <div class="status-item">
+                        <span class="label">Cámara:</span>
+                        <span id="cameraStatus" class="status-badge disconnected">Desconectada</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="label">Monitoreo:</span>
+                        <span id="monitorStatus" class="status-badge active">Activo</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="label">Alertas:</span>
+                        <span id="alertStatus" class="status-badge active">Activadas</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="label">Última actualización:</span>
+                        <span id="lastUpdate" class="timestamp">--:--:--</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics Section -->
+        <div class="stats-section">
+            <div class="stat-card">
+                <div class="stat-label">Total de Alertas</div>
+                <div class="stat-value" id="totalAlerts">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Estrés Máximo</div>
+                <div class="stat-value" id="maxStress">0%</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Temp. Máxima Registrada</div>
+                <div class="stat-value" id="maxRecorded">0°C</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Sesión Activa</div>
+                <div class="stat-value" id="sessionTime">00:00</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="static/script.js"></script>
+</body>
+</html>
