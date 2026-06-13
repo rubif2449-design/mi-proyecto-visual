@@ -194,7 +194,7 @@ function updateStressDisplay(stress) {
         statusText = '✓ Normal';
         statusColor = '#4caf50';
     } else if (stressLevel < 50) {
-        statusText = '⚠️ Leve';
+        statusText = ' Leve';
         statusColor = '#ff9800';
     } else if (stressLevel < 70) {
         statusText = 'Moderado';
