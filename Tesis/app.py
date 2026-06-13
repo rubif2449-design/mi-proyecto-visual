@@ -234,15 +234,15 @@ def receive_thermal_data():
         
         # Generar alertas si hay estrés
         if stress_result['is_stressed']:
-            stress_msg = f"⚠️ Estrés detectado: {camera_data['stress_level']:.1f}% - Temp: {camera_data['avg_temp']:.1f}°C"
+            stress_msg = f" Estrés detectado: {camera_data['stress_level']:.1f}% - Temp: {camera_data['avg_temp']:.1f}°C"
             send_notification(stress_msg, 'danger')
         
         # Alertas por temperatura crítica
         if camera_data['max_temp'] > 41.5:
-            temp_msg = f"🚨 TEMPERATURA CRÍTICA: {camera_data['max_temp']:.1f}°C detectada"
+            temp_msg = f" TEMPERATURA CRÍTICA: {camera_data['max_temp']:.1f}°C detectada"
             send_notification(temp_msg, 'danger')
         elif camera_data['avg_temp'] > 40.5:
-            temp_msg = f"⚠️ Temperatura elevada: {camera_data['avg_temp']:.1f}°C"
+            temp_msg = f" Temperatura elevada: {camera_data['avg_temp']:.1f}°C"
             send_notification(temp_msg, 'warning')
         
         # Emitir actualización a clientes WebSocket
@@ -438,7 +438,7 @@ def delete_animal(animal_id):
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 400
 
-# ==================== OPERACIONES CRUD PARA REGISTROS TÉRMICOS ====================
+#  OPERACIONES CRUD PARA REGISTROS TÉRMICOS 
 
 @app.route('/api/records', methods=['GET'])
 def list_records():
@@ -573,7 +573,7 @@ def delete_record(record_id):
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 400
 
-# ==================== OPERACIONES CRUD PARA ALERTAS ====================
+#  OPERACIONES CRUD PARA ALERTAS 
 
 @app.route('/api/alerts', methods=['GET'])
 def list_alerts():
