@@ -112,7 +112,6 @@ def estadisticas_animal(animal_id):
     conn = connect_db()
     cursor = conn.cursor()
     
-    # Datos del animal
     cursor.execute('SELECT * FROM animals WHERE id = ?', (animal_id,))
     animal = cursor.fetchone()
     
@@ -129,7 +128,6 @@ def estadisticas_animal(animal_id):
     ''', (animal_id,))
     stats = dict(cursor.fetchone())
     
-    # Alertas
     cursor.execute('''
         SELECT COUNT(*) as total, 
                SUM(CASE WHEN is_resolved = 0 THEN 1 ELSE 0 END) as unresolved
