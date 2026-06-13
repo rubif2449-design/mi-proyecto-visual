@@ -1,8 +1,3 @@
-"""
-Utilidades para simular datos de la cámara térmica
-Útil para testing sin hardware
-"""
-
 import requests
 import json
 import time
@@ -18,23 +13,17 @@ class ThermalSimulator:
         self.stress_trigger = False
         self.trend = 0
         
-    def generate_realistic_data(self):
-        """Genera datos térmicos realistas"""
-        
-        # Variación natural con tendencia
+    def generate_realistic_data(self):        
         self.trend += random.uniform(-0.05, 0.1)
         self.trend = max(-0.5, min(0.5, self.trend))  # Limitar tendencia
         
         avg_temp = self.base_temp + self.trend + random.gauss(0, 0.2)
         avg_temp = max(35, min(42, avg_temp))
         
-        # Temperatura máxima (zona caliente simulada)
         max_temp = avg_temp + random.uniform(0, 3)
-        
-        # Temperatura mínima
+    
         min_temp = avg_temp - random.uniform(0, 2)
         
-        # Datos de zonas
         zones = {
             'head': {
                 'avg_temp': avg_temp - 0.5 + random.gauss(0, 0.3),
@@ -58,22 +47,18 @@ class ThermalSimulator:
         }
     
     def simulate_normal(self):
-        """Simula estado normal"""
         self.base_temp = 37.5
         self.trend = 0
         
     def simulate_elevated(self):
-        """Simula temperatura elevada"""
         self.base_temp = 39.5
         self.trend = 0.2
         
     def simulate_stress(self):
-        """Simula estrés (temperatura muy elevada)"""
         self.base_temp = 40.5
         self.trend = 0.3
         
     def send_data(self, data):
-        """Envía datos al servidor"""
         try:
             response = requests.post(
                 SERVER_URL,
@@ -125,7 +110,6 @@ def run_simulation(duration_seconds=120, scenario='normal'):
     try:
         while time.time() - start_time < duration_seconds:
             
-            # Cambiar escenario si es ciclo
             if scenario == 'cycle':
                 elapsed_in_phase = time.time() - cycle_start
                 if elapsed_in_phase > cycle_duration:
@@ -152,11 +136,9 @@ def run_simulation(duration_seconds=120, scenario='normal'):
                     simulator.simulate_normal()
                     current_scenario = "Normal"
             
-            # Generar y enviar datos
             data = simulator.generate_realistic_data()
             simulator.send_data(data)
             
-            # Esperar antes del siguiente envío
             time.sleep(2)
             
     except KeyboardInterrupt:
@@ -170,7 +152,6 @@ def run_simulation(duration_seconds=120, scenario='normal'):
 if __name__ == "__main__":
     import sys
     
-    # Argumentos de línea de comando
     duration = 120
     scenario = 'normal'
     
@@ -179,12 +160,10 @@ if __name__ == "__main__":
     if len(sys.argv) > 2:
         duration = int(sys.argv[2])
     
-    # Validar escenario
     valid_scenarios = ['normal', 'elevated', 'stress', 'cycle']
     if scenario not in valid_scenarios:
         print(f" Escenario inválido: {scenario}")
         print(f"Opciones válidas: {', '.join(valid_scenarios)}")
         sys.exit(1)
     
-    # Ejecutar simulación
     run_simulation(duration, scenario)
