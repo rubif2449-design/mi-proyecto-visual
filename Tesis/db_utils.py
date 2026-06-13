@@ -1,8 +1,3 @@
-"""
-Utilidades para trabajar con la base de datos SQLite
-Ejecutar con: python db_utils.py
-"""
-
 import sqlite3
 import json
 from datetime import datetime, timedelta
@@ -20,12 +15,12 @@ def connect_db():
 def print_table(title, rows, headers):
     """Imprime una tabla formateada"""
     print(f"\n{'='*80}")
-    print(f"📊 {title}")
+    print(f" {title}")
     print(f"{'='*80}")
     if rows:
         print(tabulate(rows, headers=headers, tablefmt="grid", showindex=True))
     else:
-        print("⚠️ No hay datos")
+        print(" No hay datos")
 
 def listar_animales():
     """Listar todos los animales"""
@@ -122,7 +117,7 @@ def estadisticas_animal(animal_id):
     animal = cursor.fetchone()
     
     if not animal:
-        print(f"❌ Animal {animal_id} no encontrado")
+        print(f" Animal {animal_id} no encontrado")
         conn.close()
         return
     
@@ -147,7 +142,7 @@ def estadisticas_animal(animal_id):
     print(f"\n{'='*80}")
     print(f"📈 ESTADÍSTICAS - {animal['name']}")
     print(f"{'='*80}")
-    print(f"\n🐷 Información del Animal:")
+    print(f"\n Información del Animal:")
     print(f"   ID: {animal['id']}")
     print(f"   Nombre: {animal['name']}")
     print(f"   Especie: {animal['species']}")
@@ -158,23 +153,23 @@ def estadisticas_animal(animal_id):
     print(f"   Estado: {animal['status']}")
     
     if stats['count'] and stats['count'] > 0:
-        print(f"\n🌡️ Estadísticas Térmicas:")
+        print(f"\n Estadísticas Térmicas:")
         print(f"   Registros: {stats['count']}")
         print(f"   Temp. Promedio: {stats['avg']:.1f}°C")
         print(f"   Temp. Máxima: {stats['max_val']:.1f}°C")
         print(f"   Temp. Mínima: {stats['min_val']:.1f}°C")
         print(f"   Estrés Promedio: {stats['stress_avg']:.1f}%")
     else:
-        print(f"\n🌡️ Sin registros térmicos aún")
+        print(f"\n Sin registros térmicos aún")
     
-    print(f"\n⚠️ Alertas:")
+    print(f"\n Alertas:")
     print(f"   Total: {alerts['total']}")
     print(f"   Sin Resolver: {alerts['unresolved']}")
 
 def limpieza_base_datos():
     """Mostrar opciones de limpieza"""
     print(f"\n{'='*80}")
-    print(f"🧹 LIMPIEZA DE BASE DE DATOS")
+    print(f" LIMPIEZA DE BASE DE DATOS")
     print(f"{'='*80}")
     print(f"\nOpciones:")
     print(f"  1. Eliminar registros térmicos más antiguos de 30 días")
@@ -192,7 +187,7 @@ def limpieza_base_datos():
         conn.commit()
         deleted = cursor.rowcount
         conn.close()
-        print(f"✅ {deleted} registros antiguos eliminados")
+        print(f" {deleted} registros antiguos eliminados")
     
     elif choice == '2':
         conn = connect_db()
@@ -201,12 +196,12 @@ def limpieza_base_datos():
         conn.commit()
         deleted = cursor.rowcount
         conn.close()
-        print(f"✅ {deleted} alertas resueltas eliminadas")
+        print(f" {deleted} alertas resueltas eliminadas")
     
     elif choice == '3':
-        if input("⚠️ ¿Estás seguro? Esto eliminará TODO (s/n): ").lower() == 's':
+        if input(" ¿Estás seguro? Esto eliminará TODO (s/n): ").lower() == 's':
             os.remove(DB_PATH)
-            print("✅ Base de datos reseteada")
+            print(" Base de datos reseteada")
 
 def exportar_datos_csv(animal_id=None):
     """Exportar datos a CSV"""
@@ -244,13 +239,13 @@ def exportar_datos_csv(animal_id=None):
         for row in rows:
             writer.writerow(row)
     
-    print(f"✅ Datos exportados a {filename}")
+    print(f" Datos exportados a {filename}")
 
 def menu_principal():
     """Menú interactivo"""
     while True:
         print(f"\n{'='*80}")
-        print(f"🗄️ UTILIDADES DE BASE DE DATOS")
+        print(f" UTILIDADES DE BASE DE DATOS")
         print(f"{'='*80}")
         print(f"\nOpciones:")
         print(f"  1. Listar todos los animales")
@@ -272,7 +267,7 @@ def menu_principal():
                 animal_id = int(animal_id) if animal_id else None
                 listar_registros(animal_id)
             except ValueError:
-                print("❌ ID inválido")
+                print(" ID inválido")
         
         elif choice == '3':
             unresolved = input("¿Solo sin resolver? (s/n): ").lower() == 's'
@@ -283,7 +278,7 @@ def menu_principal():
                 animal_id = int(input("Ingresa ID del animal: ").strip())
                 estadisticas_animal(animal_id)
             except ValueError:
-                print("❌ ID inválido")
+                print(" ID inválido")
         
         elif choice == '5':
             try:
@@ -291,38 +286,34 @@ def menu_principal():
                 animal_id = int(animal_id) if animal_id else None
                 exportar_datos_csv(animal_id)
             except ValueError:
-                print("❌ ID inválido")
+                print(" ID inválido")
         
         elif choice == '6':
             limpieza_base_datos()
         
         elif choice == '0':
-            print("\n¡Hasta luego! 👋")
+            print("\n¡Hasta luego! ")
             break
         
         else:
-            print("❌ Opción inválida")
+            print(" Opción inválida")
 
 if __name__ == "__main__":
     print("""
-    ╔════════════════════════════════════════════════════════════╗
-    ║      UTILIDADES DE BASE DE DATOS - MONITOREO TÉRMICO       ║
-    ║                                                            ║
-    ║  Asegúrate de que el servidor está corriendo:             ║
-    ║  python app.py                                            ║
-    ║                                                            ║
-    ╚════════════════════════════════════════════════════════════╝
+    
+          UTILIDADES DE BASE DE DATOS - MONITOREO TÉRMICO      
+    
     """)
     
     if not os.path.exists(DB_PATH):
-        print(f"⚠️ Base de datos no encontrada: {DB_PATH}")
+        print(f" Base de datos no encontrada: {DB_PATH}")
         print("Asegúrate de haber ejecutado: python app.py")
     else:
         try:
             menu_principal()
         except KeyboardInterrupt:
-            print("\n\n¡Hasta luego! 👋")
+            print("\n\n¡Hasta luego! ")
         except Exception as e:
-            print(f"\n❌ Error: {str(e)}")
+            print(f"\n Error: {str(e)}")
             import traceback
             traceback.print_exc()
