@@ -77,7 +77,6 @@ camera_data = {
     'zones': {}
 }
 
-# Historial de datos
 data_history = deque(maxlen=100)
 stress_history = deque(maxlen=100)
 
@@ -209,8 +208,6 @@ def receive_thermal_data():
     """
     try:
         data = request.json
-        
-        # Actualizar datos de cámara
         camera_data['current_temp'] = data.get('avg_temp', 37.5)
         camera_data['avg_temp'] = data.get('avg_temp', 37.5)
         camera_data['max_temp'] = data.get('max_temp', 37.5)
@@ -218,11 +215,9 @@ def receive_thermal_data():
         camera_data['zones'] = data.get('zones', {})
         camera_data['timestamp'] = datetime.now().isoformat()
         
-        # Detectar estrés
         stress_result = stress_detector.detect_stress(camera_data)
         camera_data['stress_level'] = stress_result['stress_level']
         
-        # Almacenar en historial
         history_entry = {
             'timestamp': camera_data['timestamp'],
             'avg_temp': camera_data['avg_temp'],
@@ -232,12 +227,10 @@ def receive_thermal_data():
         data_history.append(history_entry)
         stress_history.append(stress_result['stress_level'])
         
-        # Generar alertas si hay estrés
         if stress_result['is_stressed']:
             stress_msg = f" Estrés detectado: {camera_data['stress_level']:.1f}% - Temp: {camera_data['avg_temp']:.1f}°C"
             send_notification(stress_msg, 'danger')
         
-        # Alertas por temperatura crítica
         if camera_data['max_temp'] > 41.5:
             temp_msg = f" TEMPERATURA CRÍTICA: {camera_data['max_temp']:.1f}°C detectada"
             send_notification(temp_msg, 'danger')
@@ -245,7 +238,6 @@ def receive_thermal_data():
             temp_msg = f" Temperatura elevada: {camera_data['avg_temp']:.1f}°C"
             send_notification(temp_msg, 'warning')
         
-        # Emitir actualización a clientes WebSocket
         try:
             socketio.emit('thermal_update', {
                 'camera_data': camera_data,
@@ -438,7 +430,6 @@ def delete_animal(animal_id):
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 400
 
-#  OPERACIONES CRUD PARA REGISTROS TÉRMICOS 
 
 @app.route('/api/records', methods=['GET'])
 def list_records():
@@ -573,8 +564,6 @@ def delete_record(record_id):
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 400
 
-#  OPERACIONES CRUD PARA ALERTAS 
-
 @app.route('/api/alerts', methods=['GET'])
 def list_alerts():
     """Listar alertas"""
@@ -661,7 +650,6 @@ def update_alert(alert_id):
         conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
         
-        # Verificar que la alerta existe
         cursor.execute('SELECT id FROM alerts WHERE id = ?', (alert_id,))
         if not cursor.fetchone():
             conn.close()
@@ -701,7 +689,6 @@ def delete_alert(alert_id):
         conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
         
-        # Verificar que la alerta existe
         cursor.execute('SELECT id FROM alerts WHERE id = ?', (alert_id,))
         if not cursor.fetchone():
             conn.close()
@@ -716,7 +703,7 @@ def delete_alert(alert_id):
         return jsonify({'success': False, 'error': str(e)}), 400
 
 if __name__ == '__main__':
-    print("🌡️ Servidor de Monitoreo Térmico iniciado")
+    print(" Servidor de Monitoreo Térmico iniciado")
     print("Escuchando en http://localhost:5000")
     print("ESP32-S3 enviar datos a: http://localhost:5000/api/thermal-data")
     socketio.run(app, host='0.0.0.0', port=5000, debug=True, allow_unsafe_werkzeug=True)
